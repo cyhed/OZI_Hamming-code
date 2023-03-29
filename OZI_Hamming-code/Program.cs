@@ -47,6 +47,7 @@ namespace OZI_Hamming_code
         {
             return "-1";
         }
+        //добавляет на нужные места битовой последовательности контрольные биты, котороые пока не несут никакой информации, а именно 0
         public static string AddEmptyControlBits(string strbits)
         {
             int powTwo = 2;
@@ -55,13 +56,18 @@ namespace OZI_Hamming_code
                 powTwo *= 2;
             return "-1";
         }
+        //производит перевод символа в битовую последовательность
         public static string CharToBits(char symbol)
         {
             string bit = Convert.ToString((int)symbol, 2);
-            while (bit.Length < 16)
+            //так как длинна битовой последовательности для каждого символа разная, приводим
+            //её к единому значению,если бит-последовательность занимает более 16, измените число
+            int BaseBitSequenceLength = 16;
+            while (bit.Length < BaseBitSequenceLength)
                 bit = '0' + bit;
             return bit;
         }
+        //производит перевод битовой последовательности в символ
         public static char BitsToChar(string strbits)
         {            
             int a = Convert.ToInt32(strbits, 2);
