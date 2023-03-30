@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Xml;
 
 namespace OZI_Hamming_code
 {
@@ -13,7 +13,8 @@ namespace OZI_Hamming_code
         {
             
             
-            Console.WriteLine(HammingCode.Coding("Hi")); 
+            Console.WriteLine(HammingCode.Coding("Hi"));
+            Console.WriteLine(HammingCode.Decoding("000100010000010101000010100000000011001001"));
         }
     }
 
@@ -29,7 +30,7 @@ namespace OZI_Hamming_code
                 //Console.WriteLine(bits);
                 bits = AddEmptyControlBits(bits);
                 //Console.WriteLine(bits);
-                int[] posBit = BitLocations(bits.Length);
+                int[] posBit = ControlBitLocations(bits.Length);
 
                 StringBuilder sb = new StringBuilder(bits);
                 foreach (var controlBit in posBit)
@@ -47,17 +48,39 @@ namespace OZI_Hamming_code
         public static string Decoding(string textBit)
         {
             string text = "";
-            for(int groupPos = 0; groupPos< textBit.Length; groupPos+= BaseBitSequenceLength)
-            {
 
+            int[] numControlBits = ControlBitLocations(BaseBitSequenceLength);
+            int numControlBitsLen = numControlBits.Length;
+
+            int bitNum =0;
+            //globalPos указывает на начало слова
+            for (int globalPos = 0; globalPos < textBit.Length; globalPos += BaseBitSequenceLength+ numControlBitsLen)
+            {
+                bitNum = 0;
+                char[] bits = new char[BaseBitSequenceLength];
+                //groupPos указывает на сивол в слове
+                for (int groupPos = 0; groupPos <numControlBitsLen+BaseBitSequenceLength; groupPos++)
+                {
+                    //пропускаем контрольные биты и запоминаем сколько пропустили, чтоб отнять от groupPos
+                    if (bitNum < numControlBitsLen && groupPos == numControlBits[bitNum] - 1)
+                    {
+                        bitNum++;
+                        continue;
+                    }
+                    else
+                    {      
+                        bits[groupPos - bitNum] = textBit[globalPos + groupPos];
+                    }
+                }
+                text = text + BitsToChar(string.Concat(bits)); ;
             }
-            return "-1";
+            return text;
         }
         //добавляет на нужные места битовой последовательности контрольные биты,
         public static string AddEmptyControlBits(string bits)
         {
             int bitLen = bits.Length;
-            int[] numControlBits = BitLocations(bits.Length);
+            int[] numControlBits = ControlBitLocations(bits.Length);
             int numControlBitsLen = numControlBits.Length;   
             int bitNum = 0;
             int newBitsLen = bitLen + numControlBitsLen;
@@ -103,8 +126,9 @@ namespace OZI_Hamming_code
             else 
                 return '1' ;
         }
-        //считает в каких местах должны быть контрольные биты
-        public static int[] BitLocations(int wordLength)
+        //Сводка:
+        //  считает в каких местах должны быть контрольные биты       
+        public static int[] ControlBitLocations(int wordLength)
         {
             int powTwo = 0;
             
