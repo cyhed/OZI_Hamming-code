@@ -11,34 +11,46 @@ namespace OZI_Hamming_code
     {
         static void Main(string[] args)
         {
-            HammingCode.Coding('䐽');            
+            
+            
+            Console.WriteLine(HammingCode.Coding("Hi")); 
         }
     }
 
     class HammingCode
-    {        
-        public static string Coding(char symbol,int baseBitSequenceLength = 16)
+    {
+        public static int BaseBitSequenceLength = 16;
+        public static string Coding(string text)
         {
-            string bits = CharToBits(symbol, baseBitSequenceLength);            
-            Console.WriteLine(bits);
-            bits = AddEmptyControlBits(bits);
-            Console.WriteLine(bits);
-            int[] posBit = BitLocations(bits.Length);
-
-            StringBuilder sb = new StringBuilder(bits);
-            foreach (var controlBit in posBit)
+            string textBit = "";
+            for (int symbolNum = 0; symbolNum < text.Length; symbolNum++)
             {
-                char CB = ControlBitCalculation(controlBit, bits);
-                Console.WriteLine(CB);
-                sb[controlBit - 1] = CB;
-            }
-            bits = sb.ToString();
-            Console.WriteLine(bits);
+                string bits = CharToBits(text[symbolNum], BaseBitSequenceLength);
+                //Console.WriteLine(bits);
+                bits = AddEmptyControlBits(bits);
+                //Console.WriteLine(bits);
+                int[] posBit = BitLocations(bits.Length);
 
-            return "-1";
+                StringBuilder sb = new StringBuilder(bits);
+                foreach (var controlBit in posBit)
+                {
+                    char CB = ControlBitCalculation(controlBit, bits);                    
+                    sb[controlBit - 1] = CB;
+                }
+                bits = sb.ToString();
+                Console.WriteLine(bits);
+                textBit = textBit+ bits;
+                
+            }
+            return textBit;
         }
-        public static string Decoding()
+        public static string Decoding(string textBit)
         {
+            string text = "";
+            for(int groupPos = 0; groupPos< textBit.Length; groupPos+= BaseBitSequenceLength)
+            {
+
+            }
             return "-1";
         }
         //добавляет на нужные места битовой последовательности контрольные биты,
@@ -77,8 +89,7 @@ namespace OZI_Hamming_code
                 for(int globalPos = groupPos; globalPos < groupPos+ bitNumber; globalPos++)
                 {
                     if (globalPos <= bits.Length)
-                    {
-                        Console.WriteLine($"{bits[globalPos - 1]} -- {globalPos}    {groupPos}");
+                    {                        
                         if (bits[globalPos - 1] == '1')
                         {
                             contOne++;
@@ -112,7 +123,7 @@ namespace OZI_Hamming_code
         public static string CharToBits(char symbol,int baseBitSequenceLength)
         {
             string bit = Convert.ToString((int)symbol, 2);
-            Console.WriteLine((int)symbol);
+            Console.Write($"{(int)symbol} ->");
             //так как длинна битовой последовательности для каждого символа разная, приводим
             //её к единому значению,если бит-последовательность занимает более 16, измените число            
             while (bit.Length < baseBitSequenceLength)
