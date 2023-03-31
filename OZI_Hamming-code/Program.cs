@@ -73,13 +73,13 @@ namespace OZI_Hamming_code
                         bits[groupPos - bitNum] = textBit[globalPos + groupPos];
                     }
                 }
-                string checkingBits = СheckingControlBits(string.Concat(bits), posControlBits);
+                string checkingBits = CheckingControlBits(string.Concat(bits), posControlBits);
                 
                 text = text + BitsToChar(checkingBits); 
             }
             return text;
         }
-        public static string СheckingControlBits(string bits, int[] posControlBits)
+        public static string CheckingControlBits(string bits, int[] posControlBits)
         {
             foreach (var controlBit in posControlBits)
             {
