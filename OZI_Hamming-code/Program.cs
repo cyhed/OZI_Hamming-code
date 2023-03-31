@@ -11,10 +11,10 @@ namespace OZI_Hamming_code
     {
         static void Main(string[] args)
         {
-            
-            
-            Console.WriteLine(HammingCode.Coding("A"));
-            Console.WriteLine(HammingCode.Decoding("111000010000010100001"));
+
+            String str = HammingCode.Coding("приввет");
+            Console.WriteLine(str);
+            Console.WriteLine(HammingCode.Decoding(str));
         }
     }
 
@@ -56,13 +56,13 @@ namespace OZI_Hamming_code
             //globalPos указывает на начало слова
             for (int globalPos = 0; globalPos < textBit.Length; globalPos += BaseBitSequenceLength + numControlBitsLen)
             {
-                
+                //выделяет из битовой последовательности сообщения, битовой последовательности символов
                 char[] bitsWithControl = new char[BaseBitSequenceLength + numControlBitsLen];
                 for (int groupPos = 0; groupPos < numControlBitsLen + BaseBitSequenceLength; groupPos++)
                 {
                     bitsWithControl[groupPos] = textBit[globalPos + groupPos];
                 }
-                Console.WriteLine(string.Concat(bitsWithControl));
+                
                 int checkingBits = CheckingControlBits(string.Concat(bitsWithControl), posControlBits);
                 if (checkingBits != 0)
                 {
@@ -77,7 +77,7 @@ namespace OZI_Hamming_code
                 char[] bits = new char[BaseBitSequenceLength];
 
                 //groupPos указывает на сивол в слове
-                for (int groupPos = 0; groupPos < numControlBitsLen + BaseBitSequenceLength; groupPos++)
+                for (int groupPos = 0;  groupPos < numControlBitsLen + BaseBitSequenceLength; groupPos++)
                 {
                     //пропускаем контрольные биты и запоминаем сколько пропустили, чтоб отнять от groupPos
                     if (bitNum < numControlBitsLen && groupPos == posControlBits[bitNum] - 1)
@@ -88,11 +88,13 @@ namespace OZI_Hamming_code
                     }
                     else
                     {
-                        bits[groupPos - bitNum] = bitsWithControl[globalPos + groupPos];
-                        
+                        Console.WriteLine($"{globalPos}+{groupPos}= {globalPos + groupPos} len{bitsWithControl.Length}");
+                        bits[groupPos - bitNum] = bitsWithControl[groupPos];                        
                     }
                 }
                 Console.WriteLine(string.Concat(bitsWithControl));
+                Console.WriteLine(string.Concat(bits));
+                
                 text = text + BitsToChar(string.Concat(bits)); 
             }
             return text;
@@ -105,7 +107,7 @@ namespace OZI_Hamming_code
             foreach (var controlBit in posControlBits)
             {
                 char CB = ControlBitCalculation(controlBit, bits);
-                Console.WriteLine($"{bits[controlBit - 1]}  {CB}");
+                Console.Write($"{bits[controlBit - 1]}  {CB}   ");
 
                 
                 if (bits[controlBit - 1] == CB)
