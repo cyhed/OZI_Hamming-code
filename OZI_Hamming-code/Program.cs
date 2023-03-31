@@ -90,7 +90,7 @@ namespace OZI_Hamming_code
             return "-1";
         }
 
-        //добавляет на нужные места битовой последовательности контрольные биты,
+        //добавляет на нужные места битовой последовательности пустые контрольные биты
         public static string AddEmptyControlBits(string bits)
         {
             int bitLen = bits.Length;
