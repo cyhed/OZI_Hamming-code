@@ -13,8 +13,8 @@ namespace OZI_Hamming_code
         {
             
             
-            Console.WriteLine(HammingCode.Coding("Hi"));
-            Console.WriteLine(HammingCode.Decoding("000100110000010101000010100000000011001001"));
+            Console.WriteLine(HammingCode.Coding("A"));
+            Console.WriteLine(HammingCode.Decoding("111000010000010100001"));
         }
     }
 
@@ -52,42 +52,76 @@ namespace OZI_Hamming_code
             int[] posControlBits = ControlBitLocations(BaseBitSequenceLength);
             int numControlBitsLen = posControlBits.Length;
 
-            
+
             //globalPos указывает на начало слова
-            for (int globalPos = 0; globalPos < textBit.Length; globalPos += BaseBitSequenceLength+ numControlBitsLen)
+            for (int globalPos = 0; globalPos < textBit.Length; globalPos += BaseBitSequenceLength + numControlBitsLen)
             {
+                
+                char[] bitsWithControl = new char[BaseBitSequenceLength + numControlBitsLen];
+                for (int groupPos = 0; groupPos < numControlBitsLen + BaseBitSequenceLength; groupPos++)
+                {
+                    bitsWithControl[groupPos] = textBit[globalPos + groupPos];
+                }
+                Console.WriteLine(string.Concat(bitsWithControl));
+                int checkingBits = CheckingControlBits(string.Concat(bitsWithControl), posControlBits);
+                if (checkingBits != 0)
+                {
+                    if (bitsWithControl[checkingBits - 1] == '1')
+                        bitsWithControl[checkingBits - 1] = '0';
+                    else
+                        bitsWithControl[checkingBits - 1] = '1';
+                }
+                
                 //бутет считать сколько символов попустили
                 int bitNum = 0;
                 char[] bits = new char[BaseBitSequenceLength];
+
                 //groupPos указывает на сивол в слове
-                for (int groupPos = 0; groupPos <numControlBitsLen+BaseBitSequenceLength; groupPos++)
+                for (int groupPos = 0; groupPos < numControlBitsLen + BaseBitSequenceLength; groupPos++)
                 {
                     //пропускаем контрольные биты и запоминаем сколько пропустили, чтоб отнять от groupPos
                     if (bitNum < numControlBitsLen && groupPos == posControlBits[bitNum] - 1)
                     {
+
                         bitNum++;
                         continue;
                     }
                     else
-                    {      
-                        bits[groupPos - bitNum] = textBit[globalPos + groupPos];
+                    {
+                        bits[groupPos - bitNum] = bitsWithControl[globalPos + groupPos];
+                        
                     }
                 }
-                string checkingBits = CheckingControlBits(string.Concat(bits), posControlBits);
-                
-                text = text + BitsToChar(checkingBits); 
+                Console.WriteLine(string.Concat(bitsWithControl));
+                text = text + BitsToChar(string.Concat(bits)); 
             }
             return text;
         }
-        public static string CheckingControlBits(string bits, int[] posControlBits)
+        public static int CheckingControlBits(string bits, int[] posControlBits)
         {
+            int numWrongBit = 0;
+            
+            
             foreach (var controlBit in posControlBits)
             {
                 char CB = ControlBitCalculation(controlBit, bits);
-                if(bits[controlBit - 1] == CB);
-                    Console.WriteLine();
+                Console.WriteLine($"{bits[controlBit - 1]}  {CB}");
+
+                
+                if (bits[controlBit - 1] == CB)
+                {
+
+                    Console.WriteLine("T");
+                }
+                else
+                {
+                    numWrongBit += controlBit;
+                    Console.WriteLine("F");
+                }
+
             }
-            return "-1";
+            Console.WriteLine(numWrongBit);
+            return numWrongBit;
         }
 
         //добавляет на нужные места битовой последовательности пустые контрольные биты
@@ -126,12 +160,13 @@ namespace OZI_Hamming_code
                 for(int globalPos = groupPos; globalPos < groupPos+ bitNumber; globalPos++)
                 {
                     if (globalPos <= bits.Length)
-                    {                        
-                        if (bits[globalPos - 1] == '1')
+                    {
+                        
+                        if (bitNumber != globalPos  && bits[globalPos - 1] == '1')
                         {
                             contOne++;
                         }
-                        
+                        //Console.WriteLine($"{bitNumber}={globalPos}-> {bits[globalPos - 1]}=>{contOne}");
                     }
                 }
             }            
